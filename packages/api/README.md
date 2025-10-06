@@ -34,4 +34,4 @@ This is the serverless API that powers the DollarNow ecosystem. It is built as a
 
 ## 🚀 Deploy
 
-O deploy é feito automaticamente via GitHub Actions sempre que há uma alteração na pasta `/packages/api`. O processo utiliza o Wrangler CLI para publicar o Worker.
+Deployment is handled automatically via GitHub Actions whenever a change is pushed to the packages/api or packages/shared directory on the main branch. The workflow uses the Wrangler CLI to publish the Worker.
