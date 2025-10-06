@@ -1,0 +1,11 @@
+{
+  "name": "extension",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npx cpx2 \"../shared/src/constants.js\" dist/lib && npx cpx2 \"*.{html,css,js,json}\" dist && npx cpx2 \"icons/**/*\" dist/icons && npx cpx2 \"../assets/logo/logo-vector.svg\" dist/icons && npx cpx2 \"sounds/**/*\" dist/sounds && npx cpx2 \"fonts/**/*\" dist/fonts && npx cpx2 \"../assets/flags/**/*\" dist/flags"
+  },
+  "devDependencies": {
+    "cpx2": "^4.2.0"
+  }
+}

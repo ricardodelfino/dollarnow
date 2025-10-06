@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DollarNow - Format Display</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="options.css"> <!-- Reuses styles -->
+    <link rel="stylesheet" href="format.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="https://dollarnow.pages.dev/" target="_blank" title="Visit DollarNow Website">
+                <img id="logo" src="icons/logo-vector.svg" alt="DollarNow Logo" />
+            </a>
+        </div>
+        <h1>Format Badge Display</h1>
+        <p>Choose how the rate for <b id="currency-name"></b> should appear on the toolbar.</p>
+
+        <div class="preview-area">
+            <div class="chrome-bar-mock">
+                <img src="icons/dollarnow-icon-16.png" />
+                <div class="badge-mock" id="badge-preview">...</div>
+            </div>
+        </div>
+
+        <div class="options-list">
+            <label class="option-item">
+                <input type="radio" name="format" value="compact_k_int">
+                <div class="option-details">
+                    <strong>Thousands (112k) - Default</strong>
+                    <small>E.g.: <span class="example" data-format="compact_k_int"></span> (Rounded number with 'k')</small>
+                </div>
+            </label>
+            <label class="option-item">
+                <input type="radio" name="format" value="compact_k_float">
+                <div class="option-details">
+                    <strong>Detailed Thousands (112.4k)</strong>
+                    <small>E.g.: <span class="example" data-format="compact_k_float"></span> (Includes one decimal place)</small>
+                </div>
+            </label>
+            <label class="option-item">
+                <input type="radio" name="format" value="full_thousands">
+                <div class="option-details">
+                    <strong>Thousands (Number only)</strong>
+                    <small>E.g.: <span class="example" data-format="full_thousands"></span> (Shows '112' for 112,456)</small>
+                </div>
+            </label>
+            <label class="option-item">
+                <input type="radio" name="format" value="full">
+                <div class="option-details">
+                    <strong>Full Number</strong>
+                    <small>E.g.: <span class="example" data-format="full"></span> (Shows the full integer, may be clipped)</small>
+                </div>
+            </label>
+        </div>
+        <p class="save-status" id="save-status"></p>
+    </div>
+    <script type="module" src="format.js"></script>
+</body>
+</html>

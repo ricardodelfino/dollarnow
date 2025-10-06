@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DollarNow - Manage Alerts</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="https://dollarnow.pages.dev/" target="_blank" title="Visit DollarNow Website">
+                <img id="logo" src="icons/logo-vector.svg" alt="DollarNow Logo" />
+            </a>
+        </div>
+        <h1>Manage Rate Alerts</h1>
+        <p>Get a notification when a currency reaches a specific value.</p>
+
+        <div class="form-container">
+            <h2>New Alert</h2>
+            <form id="add-alert-form">
+                <div class="form-row">
+                    <div class="currency-pair-selector">
+                        <div class="currency-label-with-flag" id="base-currency-label">
+                            <img src="flags/usd.svg" alt="USD" class="flag" />
+                            <span>USD</span>
+                        </div>
+                        <span class="form-separator">/</span>
+                        <div id="custom-currency-select" class="custom-select-wrapper">
+                            <button type="button" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <!-- Selected option will be populated by JS -->
+                            </button>
+                            <div class="custom-select-options" role="listbox" tabindex="-1" style="display: none;"></div>
+                        </div>
+                    </div>
+                    <button type="button" id="invert-alert-btn" title="Invert Currency" aria-label="Invert Currency">&#x21C4;</button>
+                </div>
+                <div class="form-row">
+                    <span>When rate is</span>
+                    <select id="alert-condition">
+                        <option value="above">Above</option>
+                        <option value="below">Below</option>
+                    </select>
+                    <input type="number" id="alert-value" placeholder="Value" step="0.0001" required>
+                    <div class="form-row-info">
+                        <small>Current rate: <span id="current-rate-display">...</span></small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="alert-sound">Alert Sound</label>
+                    <select id="alert-sound">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                    <button type="button" id="test-sound-btn" title="Test Sound">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+                </div>
+                <div class="form-row">
+                    <div class="tooltip">Frequency
+                        <span class="tooltiptext"><b>One-time:</b> The alert will be disabled after it's triggered.<br><br><b>Permanent:</b> You will be notified every time the condition is met.</span>
+                    </div>
+                    <select id="alert-frequency">
+                        <option value="single">One-time</option>
+                        <option value="permanent">Permanent</option>
+                    </select>
+                    <button type="submit">Add Alert</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="alerts-list-container">
+            <h2>Active Alerts</h2>
+            <ul id="alerts-list">
+                <!-- Alerts will be inserted here -->
+            </ul>
+        </div>
+    </div>
+    <script type="module" src="options.js"></script>
+</body>
+</html>

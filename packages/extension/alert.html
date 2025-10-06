@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rate Alert!</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="alert.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img id="logo-alert" src="icons/logo-vector.svg" alt="DollarNow Logo">
+        </div>
+        <div class="content">
+            <div class="pair-info">
+                <img id="base-flag" class="flag" src="flags/generic.svg" alt="">
+                <span id="pair-text">USD / BRL</span>
+                <img id="quote-flag" class="flag" src="flags/generic.svg" alt="">
+            </div>
+            <div class="condition-info">
+                <span id="condition-icon"></span>
+                <span id="condition-text">Rate went above 5.40</span>
+            </div>
+            <div class="rate-details">
+                <div class="rate-box">
+                    <span class="rate-label">Current Rate</span>
+                    <span id="current-rate" class="rate-value">5.4321</span>
+                </div>
+                <div class="rate-box">
+                    <span class="rate-label">Target Rate</span>
+                    <span id="target-rate" class="rate-value">5.4000</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <button id="manage-btn">Manage Alerts</button>
+            <button id="close-btn">Close</button>
+        </div>
+    </div>
+    <script type="module" src="alert.js"></script>
+</body>
+</html>

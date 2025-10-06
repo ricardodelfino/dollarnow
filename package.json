@@ -1,0 +1,19 @@
+{
+  "name": "dollarnow-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for the DollarNow ecosystem",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "webapp": "npm run dev --workspace=webapp",
+    "api": "npm run dev --workspace=api",
+    "build:webapp": "npm run build --workspace=webapp",
+    "build:extension": "npm run build --workspace=extension",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

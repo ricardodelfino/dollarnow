@@ -1,0 +1,160 @@
+:root {
+    --primary-color: #79b22b;
+    --danger-color: #e74c3c;
+    --bg-color: #ffffff;
+    --text-color: #333;
+    --text-secondary-color: #666;
+    --footer-bg: #f0f2f5;
+    --border-color: #e0e0e0;
+    --button-secondary-bg: #e7e7e7;
+    --button-secondary-hover-bg: #ddd;
+}
+
+body.dark-theme {
+    --bg-color: #2c2c2c;
+    --text-color: #e1e1e1;
+    --text-secondary-color: #aaa;
+    --footer-bg: #3a3a3a;
+    --border-color: #4f4f4f;
+    --button-secondary-bg: #555;
+    --button-secondary-hover-bg: #6a6a6a;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style:  normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/Inter-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style:  normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/Inter-SemiBold.woff2') format('woff2');
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-color);
+    font-size: 16px; /* Increased by ~15% from 14px */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-color);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#logo-alert {
+    height: 20px;
+    width: auto;
+    fill: var(--primary-color);
+}
+
+.content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    gap: 12px;
+}
+
+.pair-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
+.flag {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+.condition-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.1em;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.condition-info.above { background-color: rgba(121, 178, 43, 0.15); color: var(--primary-color); }
+.condition-info.below { background-color: rgba(231, 76, 60, 0.15); color: var(--danger-color); }
+
+#condition-icon { font-size: 1.3em; line-height: 1; }
+
+.rate-details {
+    display: flex;
+    gap: 20px;
+    margin-top: 5px;
+}
+
+.rate-box {
+    text-align: center;
+}
+
+.rate-label {
+    font-size: 0.9em;
+    color: var(--text-secondary-color);
+}
+
+.rate-value {
+    display: block;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.footer {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background-color: var(--footer-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+#manage-btn {
+    padding: 8px 16px;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+#close-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background-color: var(--button-secondary-bg);
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+#close-btn:hover {
+    background-color: var(--button-secondary-hover-bg);
+}
