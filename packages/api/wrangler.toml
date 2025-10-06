@@ -1,0 +1,19 @@
+# The name of your Worker. Get this exact name from your Cloudflare dashboard.
+name = "dollarnow"
+# The main entry point for your Worker.
+main = "src/index.ts"
+# The compatibility date. Use a recent date.
+compatibility_date = "2024-07-30"
+
+# Bind the KV namespaces to your Worker
+[[kv_namespaces]]
+binding = "DOLLARNOW_RATES_HISTORY_2MIN"
+id = "429c4a49bc6243c483baa4d08e5ca905"
+
+[[kv_namespaces]]
+binding = "DOLLARNOW_RATES_HISTORY_DAILY"
+id = "4ba7ded2268249e3a1e9ea63a44a5e18"
+
+# Configure the scheduler to run every day at midnight UTC
+[triggers]
+crons = ["0 0 * * *"]
