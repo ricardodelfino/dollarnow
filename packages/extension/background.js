@@ -139,6 +139,14 @@ async function checkAlerts(currentRates) {
     for (const alert of alerts) {
         if (!alert.enabled) continue;
 
+        // Check for cooldown period on permanent alerts
+        if (alert.isPermanent && alert.lastReached) {
+            const cooldownMinutes = alert.cooldown || 60; // Default to 60 mins if not set
+            const cooldownMillis = cooldownMinutes * 60 * 1000;
+            const timeSinceLastAlert = Date.now() - alert.lastReached;
+            if (timeSinceLastAlert < cooldownMillis) continue; // Skip if within cooldown
+        }
+
         let rateToCheck;
         if (alert.base === 'USD') {
             rateToCheck = currentRates[alert.quote];
@@ -183,7 +191,8 @@ async function checkAlerts(currentRates) {
 
 let creating; // Prevents the creation of multiple offscreen documents
 async function playSound(soundFile) {
-  const audioPath = `sounds/${soundFile}`;
+  // Use chrome.runtime.getURL to get the full, accessible path to the sound file.
+  const audioPath = chrome.runtime.getURL(`sounds/${soundFile}`);
   
   const sendMessageToOffscreen = () => {
     chrome.runtime.sendMessage({
@@ -276,5 +285,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         await updateBadge();
     } else if (message.action === 'testSound' && message.soundFile) {
         await playSound(message.soundFile);
+    } else if (message.action === 'openOptionsPage') {
+        chrome.runtime.openOptionsPage();
     }
 });

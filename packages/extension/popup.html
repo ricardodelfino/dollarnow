@@ -41,7 +41,14 @@
                         </button>
                         <div class="custom-select-options" role="listbox" tabindex="-1" style="display: none;"></div>
                     </div>
-                    <button id="invert-button" title="Invert Currencies" aria-label="Invert Currencies">&#x21C4;</button>
+                    <button id="invert-button" title="Invert Currencies" aria-label="Invert Currencies">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="17 1 21 5 17 9"></polyline>
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                            <polyline points="7 23 3 19 7 15"></polyline>
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -62,8 +69,10 @@
         </div>
 
         <div class="footer">
-            <span id="last-update">Updated: ...</span>
-            <div id="status-indicator" class="status-indicator" title="Status: Connected"></div>
+            <div class="status-badge">
+                <span id="last-update">Updated: ...</span>
+                <div id="status-indicator" class="status-indicator" title="Status: Connected"></div>
+            </div>
         </div>
     </div>
     <script type="module" src="popup.js"></script>

@@ -32,7 +32,14 @@
                             <div class="custom-select-options" role="listbox" tabindex="-1" style="display: none;"></div>
                         </div>
                     </div>
-                    <button type="button" id="invert-alert-btn" title="Invert Currency" aria-label="Invert Currency">&#x21C4;</button>
+                    <button type="button" id="invert-alert-btn" title="Invert Currency" aria-label="Invert Currency">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="17 1 21 5 17 9"></polyline>
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                            <polyline points="7 23 3 19 7 15"></polyline>
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                        </svg>
+                    </button>
                 </div>
                 <div class="form-row">
                     <span>When rate is</span>
@@ -63,6 +70,17 @@
                         <option value="permanent">Permanent</option>
                     </select>
                     <button type="submit">Add Alert</button>
+                </div>
+                <div class="form-row" id="cooldown-row" style="display: none;">
+                    <div class="tooltip">Cooldown
+                        <span class="tooltiptext">Specify an amount of time that must pass before this alert can fire again.</span>
+                    </div>
+                    <select id="alert-cooldown">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                    <div class="form-row-info">
+                        <small>Applies only to permanent alerts.</small>
+                    </div>
                 </div>
             </form>
         </div>

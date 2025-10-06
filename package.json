@@ -10,6 +10,7 @@
     "webapp": "npm run dev --workspace=webapp",
     "api": "npm run dev --workspace=api",
     "build:webapp": "npm run build --workspace=webapp",
+    "preview:webapp": "npm run preview --workspace=webapp",
     "build:extension": "npm run build --workspace=extension",
     "build": "npm run build --workspaces --if-present"
   },

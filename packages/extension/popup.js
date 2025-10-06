@@ -1,4 +1,5 @@
-import { ALL_CURRENCIES, currencyMetadata, ASSET_SYMBOLS, FIAT_SYMBOLS } from './lib/constants.js';
+import { currencyMetadata, ASSET_SYMBOLS, FIAT_SYMBOLS } from './lib/constants.js';
+import { createLocalizedNumberFormatter, parseLocalizedNumber } from './lib/formatters.js';
 
 const themeCheckbox = document.getElementById('theme-checkbox');
 const customCurrencySelect = document.getElementById('custom-currency-select');
@@ -19,11 +20,12 @@ const statusIndicatorEl = document.getElementById('status-indicator');
 
 let state = { rates: {}, selectedCurrency: 'BRL', inverted: false, theme: 'system', updatedAt: null };
 let userLocale = chrome.i18n.getUILanguage();
-
-const numberFormatter = new Intl.NumberFormat(userLocale, {
+// Create a reusable formatter instance using our new shared function.
+const formatNumber = createLocalizedNumberFormatter(userLocale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 4
 });
+
 
 function applyTheme(theme) {
     let isDark;
@@ -128,8 +130,8 @@ function displayInitialConversion() {
     const baseValue = 1;
     const targetValue = state.inverted ? (1 / rate) : (1 * rate);
     
-    inputOne.value = numberFormatter.format(state.inverted ? targetValue : baseValue);
-    inputTwo.value = numberFormatter.format(state.inverted ? baseValue : targetValue);
+    inputOne.value = formatNumber(state.inverted ? targetValue : baseValue);
+    inputTwo.value = formatNumber(state.inverted ? baseValue : targetValue);
 }
 
 function updateFooter() {
@@ -146,15 +148,6 @@ function updateChartLink() {
     chartLink.href = `https://www.xe.com/currencycharts/?from=${from}&to=${to}&view=1D`;
 }
 
-function parseLocalizedNumber(str) {
-    const thousandSeparator = (1111).toLocaleString(userLocale).substring(1, 2);
-    const decimalSeparator = (1.1).toLocaleString(userLocale).substring(1, 2);
-    return parseFloat(
-        String(str).replace(new RegExp(`\\${thousandSeparator}`, 'g'), '')
-                   .replace(new RegExp(`\\${decimalSeparator}`), '.')
-    );
-}
-
 function handleInput(event) {
     const sourceInput = event.target;
     const targetInput = sourceInput === inputOne ? inputTwo : inputOne;
@@ -163,8 +156,7 @@ function handleInput(event) {
         targetInput.value = '';
         return;
     }
-
-    const sourceValue = parseLocalizedNumber(sourceInput.value);
+    const sourceValue = parseLocalizedNumber(sourceInput.value, userLocale);
     if (isNaN(sourceValue)) {
         return;
     }
@@ -180,7 +172,7 @@ function handleInput(event) {
     } else {
         targetValue = sourceValue / rate;
     }
-    targetInput.value = numberFormatter.format(targetValue);
+    targetInput.value = formatNumber(targetValue);
 }
 
 async function handleCurrencyChange(newCurrency) {
@@ -206,8 +198,8 @@ async function handleInvert() {
 async function handleThemeToggle(event) {
     state.theme = event.target.checked ? 'dark' : 'light';
     
-    applyTheme(state.theme);
     await chrome.storage.local.set({ theme: state.theme });
+    applyTheme(state.theme);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

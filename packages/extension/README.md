@@ -5,25 +5,28 @@
 </p>
 
 
-This is the DollarNow Google Chrome extension, which brings currency exchange rate functionality directly to your browser toolbar.
+This is the DollarNow Google Chrome extension, which brings real-time currency exchange rates and conversion tools directly to your browser.
 
 ## ✨ Features
 
-*   **Badge Rate Display**: See the real-time rate of your selected currency directly on the extension icon.
-*   **Quick Converter**: Open the popup to perform quick conversions between the US Dollar (USD) and your currency of choice.
-*   **Currency Selection**: Easily choose which currency to track. Your preference is saved and synced.
-*   **Inverted View**: Quickly toggle between `USD -> CURRENCY` and `CURRENCY -> USD`.
-*   **Rate Alerts**: Set up alerts to be notified when a currency reaches a specific value (above or below).
-    *   Customizable visual and sound notifications.
-    *   Option for permanent or one-time alerts.
-*   **Badge Formatting**: For currencies with high values (over 1000), you can customize how the number is displayed on the badge (e.g., `112k`, `112.4k`, `112`).
-*   **Light & Dark Theme**: The interface adapts to your system theme, or you can choose one manually.
+*   **Real-Time Badge**: See the live exchange rate of your favorite currency directly on the toolbar icon.
+*   **Instant Converter**: A quick-access popup to convert values between USD and over 20 other currencies and assets.
+*   **Smart Currency Selection**: Choose from a categorized list of fiat currencies and assets (like Gold, Silver, and Bitcoin).
+*   **Custom Rate Alerts**: Get visual and sound notifications when a currency hits your target value.
+    *   Set alerts for rates going "above" or "below" a certain point.
+    *   Choose between one-time or permanent alerts.
+    *   Configure a "cooldown" period for permanent alerts to avoid excessive notifications.
+*   **Customizable Display**: For large numbers, you can choose how the rate is formatted on the badge (e.g., `112k`, `112.4k`, or `112`).
+*   **Light & Dark Mode**: The interface automatically adapts to your system's theme, or you can toggle it manually.
+*   **Seamless Webapp Integration**: The extension intelligently interacts with the DollarNow Webapp, providing a unified experience.
 
-## 🛠️ How to Install for Development
+##  Install
 
-Since the extension is not on the Chrome Web Store, you can load it locally to test or use it.
+You can install the extension directly from the Chrome Web Store:
 
-### 1. Build the Extension
+**[Install DollarNow for Chrome](https://chromewebstore.google.com/detail/dollarnow/gfohldokldppbdmcbhmppjiedoobhlfk)**
+
+## 🛠️ How to Install for Development (Alternative)
 
 Because this extension uses code and assets from the `shared` and `assets` packages, you must first run a build script. This script prepares a `dist` folder with all the necessary files in a format the browser can understand.
 

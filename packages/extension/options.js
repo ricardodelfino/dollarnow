@@ -1,6 +1,7 @@
 import { ALL_CURRENCIES, currencyMetadata, ASSET_SYMBOLS } from './lib/constants.js';
 
 const addAlertForm = document.getElementById('add-alert-form');
+const alertFrequencySelect = document.getElementById('alert-frequency');
 const alertSoundSelect = document.getElementById('alert-sound');
 // The actual sound file names. The text for the dropdown will be generated from these.
 const soundOptions = [
@@ -13,6 +14,22 @@ const soundOptions = [
     { value: 'double-cow-bell.mp3' },
     { value: 'marimba-bubble.mp3' },
     { value: 'uncap-bottle.mp3' }
+];
+const cooldownRow = document.getElementById('cooldown-row');
+const cooldownSelect = document.getElementById('alert-cooldown');
+const cooldownOptions = [
+    { value: 5, text: '5 minutes' },
+    { value: 10, text: '10 minutes' },
+    { value: 15, text: '15 minutes' },
+    { value: 30, text: '30 minutes' },
+    { value: 60, text: '1 hour' },
+    { value: 120, text: '2 hours' },
+    { value: 240, text: '4 hours' },
+    { value: 360, text: '6 hours' },
+    { value: 720, text: '12 hours' },
+    { value: 1440, text: '24 hours' },
+    { value: 10080, text: '7 days' },
+    { value: 43200, text: '30 days' }
 ];
 const customCurrencySelect = document.getElementById('custom-currency-select');
 const selectTrigger = customCurrencySelect.querySelector('.custom-select-trigger');
@@ -47,6 +64,17 @@ function formatSoundName(filename) {
     // 'door-bell.mp3' -> 'Door Bell'
     const name = filename.replace('.mp3', '').replace(/-/g, ' ');
     return '🔊 ' + name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+function populateCooldownDropdown() {
+    cooldownSelect.innerHTML = '';
+    cooldownOptions.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.text;
+        cooldownSelect.appendChild(option);
+    });
+    cooldownSelect.value = '60'; // Default to 1 hour
 }
 
 function populateSoundDropdown() {
@@ -149,6 +177,11 @@ function updateAlertFormUI() {
     updateCurrentRateDisplay();
 }
 
+function handleFrequencyChange() {
+    const isPermanent = alertFrequencySelect.value === 'permanent';
+    cooldownRow.style.display = isPermanent ? 'flex' : 'none';
+}
+
 function playTestSound() {
     const selectedSound = alertSoundSelect.value;
     if (selectedSound && selectedSound !== 'none') {
@@ -177,6 +210,20 @@ async function renderAlerts() {
 			? `Last triggered: ${new Date(alert.lastReached).toLocaleString(userLocale)}`
 			: '';
 
+        const cooldownOptionsHtml = cooldownOptions.map(opt =>
+            `<option value="${opt.value}" ${alert.cooldown === opt.value ? 'selected' : ''}>${opt.text}</option>`
+        ).join('');
+
+        // Show cooldown select only if the alert is permanent
+        const cooldownSelectHtml = alert.isPermanent ? `
+            <div class="control-group cooldown-group">
+                <label>Cooldown</label>
+                <select class="alert-cooldown-select" data-action="edit" data-field="cooldown">
+                    ${cooldownOptionsHtml}
+                </select>
+            </div>
+        ` : '';
+
         const soundOptionsHtml = soundOptions.map(sound =>
             `<option
                 value="${sound.value}"
@@ -188,6 +235,7 @@ async function renderAlerts() {
         li.innerHTML = `
             <div class="alert-main-info">
                 <div class="alert-pair">
+                    <span class="save-status-indicator"></span>
                     <span class="pair-text">${alert.base} / ${alert.quote}</span>
                 </div>
                 <div class="actions">
@@ -199,21 +247,19 @@ async function renderAlerts() {
                 </div>
             </div>
             <div class="alert-controls">
-                <div class="control-group">
-                    <label>Condition</label>
-                    <select class="alert-condition-select" data-action="edit" data-field="condition">
-                        <option value="above" ${alert.condition === 'above' ? 'selected' : ''}>Above</option>
-                        <option value="below" ${alert.condition === 'below' ? 'selected' : ''}>Below</option>
-                    </select>
-                    <input type="number" class="alert-value-input" value="${alert.value}" step="0.0001" data-action="edit" data-field="value">
+                <div class="control-group condition-group">
+                     <select class="alert-condition-select" data-action="edit" data-field="condition">
+                         <option value="above" ${alert.condition === 'above' ? 'selected' : ''}>Above</option>
+                         <option value="below" ${alert.condition === 'below' ? 'selected' : ''}>Below</option>
+                     </select>
+                     <input type="number" class="alert-value-input" value="${alert.value}" step="0.0001" data-action="edit" data-field="value">
                 </div>
-                <div class="control-group">
-                    <select class="alert-sound-select" data-action="edit" data-field="sound">
-                        ${soundOptionsHtml}
-                    </select>
+                <div class="control-group sound-group">
+                    <select class="alert-sound-select" data-action="edit" data-field="sound">${soundOptionsHtml}</select>
                 </div>
-                <div class="control-group frequency-group">
-                    <span class="frequency-toggle" data-action="toggle-frequency" title="Click to change frequency">${permanentText}</span>
+                ${cooldownSelectHtml}
+                <div class="control-group frequency-group" data-action="toggle-frequency" title="Click to change frequency">
+                    <span class="frequency-toggle">${permanentText}</span>
                 </div>
             </div>
         `;
@@ -229,6 +275,7 @@ addAlertForm.addEventListener('submit', async (e) => {
         condition: document.getElementById('alert-condition').value,
         value: parseFloat(document.getElementById('alert-value').value),
         isPermanent: document.getElementById('alert-frequency').value === 'permanent',
+        cooldown: document.getElementById('alert-frequency').value === 'permanent' ? parseInt(cooldownSelect.value, 10) : 60, // Default to 60 mins if permanent
 		sound: document.getElementById('alert-sound').value,
         enabled: true,
         lastReached: null
@@ -239,6 +286,7 @@ addAlertForm.addEventListener('submit', async (e) => {
     await chrome.storage.local.set({ alerts });
     addAlertForm.reset();
     updateSelectedOption(state.selectedCurrency); // Reset to default selected currency
+    handleFrequencyChange(); // Hide cooldown row after reset
     renderAlerts();
 });
 
@@ -261,12 +309,14 @@ async function handleAlertListInteraction(e) {
     } else if (action === 'toggle') {
         alerts[alertIndex].enabled = !alerts[alertIndex].enabled;
         needsSave = true;
-    } else if (action === 'toggle-frequency') {
+    } else if (action === 'toggle-frequency' && target.classList.contains('frequency-group')) {
         alerts[alertIndex].isPermanent = !alerts[alertIndex].isPermanent;
         needsSave = true;
     } else if (action === 'edit') {
         const field = target.dataset.field;
         const value = target.type === 'number' ? parseFloat(target.value) : target.value;
+        
+        // Only save if the value has actually changed
         if (alerts[alertIndex][field] !== value) {
             alerts[alertIndex][field] = value;
             needsSave = true;
@@ -274,8 +324,22 @@ async function handleAlertListInteraction(e) {
     }
 
     if (needsSave) {
+        // For edits, show saving feedback instead of re-rendering the whole list
+        if (action === 'edit') {
+            alertLi.classList.add('is-saving');
+        }
         await chrome.storage.local.set({ alerts });
-        renderAlerts(); // Re-render to reflect changes
+
+        if (action === 'edit') {
+            alertLi.classList.remove('is-saving');
+            alertLi.classList.add('is-saved');
+            setTimeout(() => {
+                alertLi.classList.remove('is-saved');
+            }, 2000);
+        } else {
+            // For actions that change the structure (delete, toggle frequency), a re-render is still best.
+            renderAlerts();
+        }
     }
 }
 
@@ -291,11 +355,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await chrome.storage.local.get(['rates', 'selectedCurrency', 'theme']);
     state = { ...state, ...data };
     
-    applyTheme(state.theme);
     populateSoundDropdown();
+    populateCooldownDropdown();
+    applyTheme(state.theme);
     populateCurrencyDropdown();
     updateAlertFormUI();
     renderAlerts();
+    handleFrequencyChange(); // Set initial state of cooldown row
 
     const testSoundBtn = document.getElementById('test-sound-btn');
     testSoundBtn.addEventListener('click', playTestSound);
@@ -307,4 +373,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectTrigger.setAttribute('aria-expanded', 'false');
         }
     });
+
+    alertFrequencySelect.addEventListener('change', handleFrequencyChange);
 });

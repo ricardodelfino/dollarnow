@@ -25,6 +25,13 @@
     "service_worker": "background.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://dollarnow.pages.dev/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_start"
+    }
+  ],
   "options_page": "options.html",
   "icons": {
     "16": "icons/dollarnow-icon-16.png",
