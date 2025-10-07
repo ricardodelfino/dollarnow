@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ThemeToggle from './ThemeToggle.svelte';
+	import logoUrl from '$lib/assets/logo/logo-vector.svg';
 </script>
 
 
@@ -7,7 +8,7 @@
 	<div class="placeholder"></div>
 	<div class="logo-container">
 		<a href="/" aria-label="Go to homepage">
-			<img src="/logo/logo-vector.svg" alt="DollarNow Logo" class="logo-img" />
+			<img src={logoUrl} alt="DollarNow Logo" class="logo-img" />
 		</a>
 	</div>
 	<div class="actions">
