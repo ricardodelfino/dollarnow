@@ -4,7 +4,7 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"copy:assets": "npx cpx2 \"../assets/flags/**/*\" static/flags -C && npx cpx2 \"../assets/logo/logo-vector.svg\" static/logo -C && npx cpx2 \"../assets/logo/favicon.svg\" static -C && npx cpx2 \"../assets/icons/**/*\" static -C",
+		"copy:assets": "mkdir -p static && npx cpx2 \"../assets/flags/**/*\" static/flags -C && npx cpx2 \"../assets/logo/logo-vector.svg\" static/logo -C && npx cpx2 \"../assets/logo/favicon.svg\" static -C && npx cpx2 \"../assets/icons/**/*\" static -C",
 		"clean": "rimraf .svelte-kit build static",
 		"dev": "npm-run-all -p copy:assets vite:dev",
 		"vite:dev": "vite dev --force",
