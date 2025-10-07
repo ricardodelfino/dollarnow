@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "wrangler dev"
+    "dev": "wrangler dev",
+    "build": "echo \"No build step required for API, handled by Wrangler.\""
   },
   "keywords": [],
   "author": "",
