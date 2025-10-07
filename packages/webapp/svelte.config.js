@@ -8,7 +8,11 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		alias: {
+			// This is the SvelteKit-native way to handle monorepo package aliases.
+			'shared': '../shared/src'
+		}
 	}
 };
 
