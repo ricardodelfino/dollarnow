@@ -121,13 +121,15 @@ function updateConverterUI() {
 
 function displayInitialConversion() {
     const rate = state.rates[state.selectedCurrency];
-    if (!rate) {
+    if (typeof rate !== 'number') {
         inputOne.value = '';
         inputTwo.value = '';
         return;
     };
 
-    const baseValue = 1;
+    // Always start by showing a conversion for "1" unit of the most valuable currency in the pair.
+    // This avoids showing "1 USD = 0.000015 BTC" and instead shows "1 BTC = 65,000 USD" if inverted.
+    const baseValue = 1.0;
     const targetValue = state.inverted ? (1 / rate) : (1 * rate);
     
     inputOne.value = formatNumber(state.inverted ? targetValue : baseValue);

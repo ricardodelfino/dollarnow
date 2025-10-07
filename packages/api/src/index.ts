@@ -50,16 +50,15 @@ type HistoryEntry = {
  */
 async function fetchFiatFromWise(symbols: string[], apiKey: string): Promise<Rates> {
     console.log('Attempting to fetch FIAT rates from Wise...');
-    const headers = { Authorization: `Bearer ${apiKey}` };
     const rates: Rates = {};
  
     // Fetch all quotes concurrently for better performance.
     const quotePromises = symbols
         .filter(symbol => symbol !== 'USD')
         .map(symbol =>
-            fetch(`https://api.wise.com/v3/profiles/me/quotes`, {
+            fetch(`https://api.wise.com/v1/quotes`, {
                 method: 'POST',
-                headers: { ...headers, 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
                 body: JSON.stringify({
                     sourceCurrency: 'USD',
                     targetCurrency: symbol,
@@ -124,8 +123,11 @@ async function fetchFromAwesomeApi(fiatSymbols: string[], assetSymbols: string[]
  * Fetches current rates from primary and fallback sources.
  */
 async function fetchAllCurrentRates(env: Env): Promise<Rates> {
+	// Ensure we only ask Wise for actual FIAT currencies, excluding assets like BTC.
+	const fiatSymbolsForWise = FIAT_SYMBOLS.filter(s => !ASSET_SYMBOLS.includes(s));
+
 	const [wiseFiatRates, awesomeAssetRates] = await Promise.all([
-		fetchFiatFromWise(FIAT_SYMBOLS, env.WISE_API_KEY),
+		fetchFiatFromWise(fiatSymbolsForWise, env.WISE_API_KEY),
 		fetchFromAwesomeApi([], ASSET_SYMBOLS, env.AWESOME_API_TOKEN),
 	]);
 
