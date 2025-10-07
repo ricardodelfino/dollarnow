@@ -86,6 +86,7 @@ async function fetchFiatFromWise(symbols: string[], apiKey: string): Promise<Rat
                 sourceCurrency: 'USD',
                 targetCurrency: symbol,
                 sourceAmount: 100, // Use a round number for precision
+                payOut: 'BALANCE', // Required by the v1 quotes endpoint
             });
 
             return fetch('https://api.wise.com/v1/quotes', {
