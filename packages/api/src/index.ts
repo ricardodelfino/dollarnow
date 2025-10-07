@@ -43,6 +43,25 @@ type HistoryEntry = {
 };
 
 // --- Fetcher Functions ---
+/**
+ * Fetches the user's personal profile ID from Wise.
+ * This is required for creating quotes with the v1 API.
+ */
+async function getWiseProfileId(apiKey: string): Promise<number | null> {
+    try {
+        const response = await fetch('https://api.wise.com/v1/profiles', {
+            headers: { Authorization: `Bearer ${apiKey}` },
+        });
+        if (!response.ok) return null;
+        const profiles = await response.json();
+        // Find the personal profile and return its ID
+        const personalProfile = profiles.find((p: any) => p.type === 'PERSONAL');
+        return personalProfile ? personalProfile.id : null;
+    } catch (error) {
+        console.error('Failed to fetch Wise profile ID:', error);
+        return null;
+    }
+}
 
 /**
  * Fetches FIAT rates from the Wise API.
@@ -50,33 +69,45 @@ type HistoryEntry = {
  */
 async function fetchFiatFromWise(symbols: string[], apiKey: string): Promise<Rates> {
     console.log('Attempting to fetch FIAT rates from Wise...');
-    const rates: Rates = {};
  
-    // Fetch all quotes concurrently for better performance.
+ 
+    const profileId = await getWiseProfileId(apiKey);
+    if (!profileId) {
+        console.error('Could not retrieve a Wise profile ID. Aborting Wise fetch.');
+        return {};
+    }
+
+    const rates: Rates = {};
     const quotePromises = symbols
         .filter(symbol => symbol !== 'USD')
-        .map(symbol =>
-            fetch(`https://api.wise.com/v1/quotes`, {
+        .map(symbol => {
+            const body = JSON.stringify({
+                profile: profileId,
+                sourceCurrency: 'USD',
+                targetCurrency: symbol,
+                sourceAmount: 100, // Use a round number for precision
+            });
+
+            return fetch('https://api.wise.com/v1/quotes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-                body: JSON.stringify({
-                    sourceCurrency: 'USD',
-                    targetCurrency: symbol,
-                    sourceAmount: 100, // Use a round number for precision
-                })
-            }).then(response => {
+                body: body,
+            })
+            .then(response => {
                 if (!response.ok) {
                     console.warn(`Wise API failed for ${symbol} with status: ${response.status}`);
                     return null;
                 }
                 return response.json();
-            }).then((quote: WiseQuote | null) => {
+            })
+            .then((quote: WiseQuote | null) => {
                 if (quote && quote.rate) {
                     rates[symbol] = quote.rate;
                 }
-            }).catch(error => console.error(`Error fetching ${symbol} from Wise:`, error))
-        );
- 
+            })
+            .catch(error => console.error(`Error fetching ${symbol} from Wise:`, error));
+        });
+
     await Promise.all(quotePromises);
     console.log(`Successfully fetched ${Object.keys(rates).length} FIAT rates from Wise.`);
     return rates;
