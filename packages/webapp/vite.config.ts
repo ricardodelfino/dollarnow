@@ -4,13 +4,9 @@ import path from 'path';
 
 export default defineConfig({
 	plugins: [sveltekit()],
-	// This ensures that Vite properly handles the 'shared' package from the monorepo.
-	optimizeDeps: {
-		include: ['shared']
-	},
-	build: {
-		commonjsOptions: {
-			include: [/shared/, /node_modules/]
-		}
+	// This is the crucial part for production builds in a monorepo.
+	// It tells Vite to bundle the 'shared' package instead of treating it as an external dependency during SSR.
+	ssr: {
+		noExternal: ['shared']
 	}
 });
