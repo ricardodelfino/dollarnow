@@ -4,10 +4,13 @@ import path from 'path';
 
 export default defineConfig({
 	plugins: [sveltekit()],
-	server: {
-		fs: {
-			// Allow serving files from one level up to the project root, which is necessary for a monorepo.
-			allow: [path.resolve(__dirname, '..')]
+	// This ensures that Vite properly handles the 'shared' package from the monorepo.
+	optimizeDeps: {
+		include: ['shared']
+	},
+	build: {
+		commonjsOptions: {
+			include: [/shared/, /node_modules/]
 		}
 	}
 });
