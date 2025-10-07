@@ -9,6 +9,10 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
+		files: {
+			// This tells SvelteKit to treat the shared 'assets' package as its static directory.
+			assets: '../assets'
+		},
 		alias: {
 			// This is the SvelteKit-native way to handle monorepo package aliases.
 			'shared': '../shared/src'
