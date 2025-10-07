@@ -1,12 +1,15 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import path from 'path';
 
 export default defineConfig({
 	plugins: [sveltekit()],
-	// This is the crucial part for production builds in a monorepo.
-	// It tells Vite to bundle the 'shared' package instead of treating it as an external dependency during SSR.
+	// This configuration is essential for a monorepo setup.
 	ssr: {
+		// Tells Vite's SSR build to bundle the 'shared' package instead of treating it as external.
 		noExternal: ['shared']
+	},
+	optimizeDeps: {
+		// Forces Vite's pre-bundler to include the 'shared' package for client-side code.
+		include: ['shared']
 	}
 });
