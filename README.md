@@ -18,7 +18,7 @@ The monorepo is managed with `npm workspaces` and contains the following package
 
 The main web application, built with SvelteKit and hosted on Cloudflare Pages. It offers a complete interface for currency conversion.
 
-*   **Access**: dollarnow.app
+*   **Access**: dollarnow.pages.dev
 *   **Read more**: `packages/webapp/README.md`
 
 ### `/packages/api`

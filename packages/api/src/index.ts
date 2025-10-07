@@ -12,6 +12,7 @@ import { FIAT_SYMBOLS, ASSET_SYMBOLS } from 'shared';
 export interface Env {
 	AWESOME_API_TOKEN: string;
 	WISE_API_KEY: string;
+	ALPHAVANTAGE_API_KEY: string;
 	DOLLARNOW_RATES_HISTORY_2MIN: KVNamespace;
 	DOLLARNOW_RATES_HISTORY_DAILY: KVNamespace;
 }
@@ -119,6 +120,43 @@ async function fetchFromAwesomeApi(fiatSymbols: string[], assetSymbols: string[]
 }
 
 /**
+ * Fetches FIAT rates from Alpha Vantage as a final fallback.
+ */
+async function fetchFromAlphaVantage(symbols: string[], apiKey: string): Promise<Rates> {
+    console.log('Attempting to fetch rates from Alpha Vantage as final fallback...');
+    const rates: Rates = {};
+
+    // Alpha Vantage API has a low rate limit, so we fetch one by one with a small delay.
+    // This is acceptable for a last-resort fallback.
+    for (const symbol of symbols) {
+        if (symbol === 'USD') continue;
+        try {
+            const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=${symbol}&apikey=${apiKey}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                console.warn(`Alpha Vantage API failed for ${symbol} with status: ${response.status}`);
+                continue;
+            }
+            const data = await response.json();
+            const rateValue = data?.['Realtime Currency Exchange Rate']?.['5. Exchange Rate'];
+            if (rateValue) {
+                rates[symbol] = parseFloat(rateValue);
+            } else {
+                console.warn(`Alpha Vantage did not return a rate for ${symbol}. Response:`, data);
+            }
+            // Add a small delay to respect potential rate limits on free tiers.
+            await new Promise(resolve => setTimeout(resolve, 250));
+        } catch (error) {
+            console.error(`Error fetching ${symbol} from Alpha Vantage:`, error);
+        }
+    }
+
+    console.log(`Successfully fetched ${Object.keys(rates).length} rates from Alpha Vantage.`);
+    return rates;
+}
+
+
+/**
  * Fetches current rates from primary and fallback sources.
  */
 async function fetchAllCurrentRates(env: Env): Promise<Rates> {
@@ -135,11 +173,18 @@ async function fetchAllCurrentRates(env: Env): Promise<Rates> {
         const awesomeAssetRates = await fetchFromAwesomeApi([], ASSET_SYMBOLS, env.AWESOME_API_TOKEN);
         finalRates = { ...finalRates, ...awesomeAssetRates };
     } else {
-        // Wise failed completely. Fallback to AwesomeAPI for EVERYTHING.
+        // Wise failed completely. Fallback to AwesomeAPI for all remaining symbols.
         console.log('Wise fetch failed. Falling back to AwesomeAPI for all remaining symbols.');
         const missingFiatSymbols = FIAT_SYMBOLS.filter(s => !finalRates[s]);
-        const fallbackRates = await fetchFromAwesomeApi(missingFiatSymbols, ASSET_SYMBOLS, env.AWESOME_API_TOKEN);
-        finalRates = { ...finalRates, ...fallbackRates };
+        try {
+            const awesomeFallbackRates = await fetchFromAwesomeApi(missingFiatSymbols, ASSET_SYMBOLS, env.AWESOME_API_TOKEN);
+            finalRates = { ...finalRates, ...awesomeFallbackRates };
+        } catch (awesomeError) {
+            console.error('AwesomeAPI fallback also failed. Attempting final fallback to Alpha Vantage for FIAT.', awesomeError);
+            const missingFiatForAlpha = FIAT_SYMBOLS.filter(s => !finalRates[s]);
+            const alphaVantageRates = await fetchFromAlphaVantage(missingFiatForAlpha, env.ALPHAVANTAGE_API_KEY);
+            finalRates = { ...finalRates, ...alphaVantageRates };
+        }
     }
 
     return finalRates;

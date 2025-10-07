@@ -9,11 +9,7 @@
 
 **DollarNow** is a sleek, fast, and user-friendly currency converter web application. It provides real-time exchange rates for a wide range of fiat currencies and assets, with a clean interface and a delightful user experience.
 
-The live version is available at: **dollarnow.app**
-
- <!-- TODO: Add a screenshot of the app here -->
-
----
+The live version is available at: **dollarnow.pages.dev**
 
 ## ✨ Features
 
@@ -71,4 +67,4 @@ npm run build:webapp
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+> Deployment is handled automatically by Cloudflare Pages, which monitors the `main` branch of the GitHub repository.
