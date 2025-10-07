@@ -43,25 +43,6 @@ type HistoryEntry = {
 };
 
 // --- Fetcher Functions ---
-/**
- * Fetches the user's personal profile ID from Wise.
- * This is required for creating quotes with the v1 API.
- */
-async function getWiseProfileId(apiKey: string): Promise<number | null> {
-    try {
-        const response = await fetch('https://api.wise.com/v1/profiles', {
-            headers: { Authorization: `Bearer ${apiKey}` },
-        });
-        if (!response.ok) return null;
-        const profiles = await response.json();
-        // Find the personal profile and return its ID
-        const personalProfile = profiles.find((p: any) => p.type === 'PERSONAL');
-        return personalProfile ? personalProfile.id : null;
-    } catch (error) {
-        console.error('Failed to fetch Wise profile ID:', error);
-        return null;
-    }
-}
 
 /**
  * Fetches FIAT rates from the Wise API.
@@ -69,30 +50,15 @@ async function getWiseProfileId(apiKey: string): Promise<number | null> {
  */
 async function fetchFiatFromWise(symbols: string[], apiKey: string): Promise<Rates> {
     console.log('Attempting to fetch FIAT rates from Wise...');
- 
- 
-    const profileId = await getWiseProfileId(apiKey);
-    if (!profileId) {
-        console.error('Could not retrieve a Wise profile ID. Aborting Wise fetch.');
-        return {};
-    }
-
     const rates: Rates = {};
+    // The /v1/rates endpoint is simpler and doesn't require a profile ID.
     const quotePromises = symbols
         .filter(symbol => symbol !== 'USD')
         .map(symbol => {
-            const body = JSON.stringify({
-                profile: profileId,
-                sourceCurrency: 'USD',
-                targetCurrency: symbol,
-                sourceAmount: 100, // Use a round number for precision
-                payOut: 'BALANCE', // Required by the v1 quotes endpoint
-            });
-
-            return fetch('https://api.wise.com/v1/quotes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-                body: body,
+            // Construct the URL for the rates endpoint
+            const url = `https://api.wise.com/v1/rates?source=USD&target=${symbol}`;
+            return fetch(url, {
+                headers: { Authorization: `Bearer ${apiKey}` },
             })
             .then(response => {
                 if (!response.ok) {
@@ -101,9 +67,10 @@ async function fetchFiatFromWise(symbols: string[], apiKey: string): Promise<Rat
                 }
                 return response.json();
             })
-            .then((quote: WiseQuote | null) => {
-                if (quote && quote.rate) {
-                    rates[symbol] = quote.rate;
+            .then((rateData: any[] | null) => {
+                // The v1/rates endpoint returns an array of rates. We take the first one.
+                if (rateData && rateData.length > 0 && rateData[0].rate) {
+                    rates[symbol] = rateData[0].rate;
                 }
             })
             .catch(error => console.error(`Error fetching ${symbol} from Wise:`, error));
@@ -155,23 +122,27 @@ async function fetchFromAwesomeApi(fiatSymbols: string[], assetSymbols: string[]
  * Fetches current rates from primary and fallback sources.
  */
 async function fetchAllCurrentRates(env: Env): Promise<Rates> {
-	// Ensure we only ask Wise for actual FIAT currencies, excluding assets like BTC.
-	const fiatSymbolsForWise = FIAT_SYMBOLS.filter(s => !ASSET_SYMBOLS.includes(s));
+    // Ensure we only ask Wise for actual FIAT currencies, excluding assets like BTC.
+    const fiatSymbolsForWise = FIAT_SYMBOLS.filter(s => !ASSET_SYMBOLS.includes(s));
 
-	const [wiseFiatRates, awesomeAssetRates] = await Promise.all([
-		fetchFiatFromWise(fiatSymbolsForWise, env.WISE_API_KEY),
-		fetchFromAwesomeApi([], ASSET_SYMBOLS, env.AWESOME_API_TOKEN),
-	]);
+    const wiseFiatRates = await fetchFiatFromWise(fiatSymbolsForWise, env.WISE_API_KEY);
 
-	let finalRates: Rates = { USD: 1, ...wiseFiatRates, ...awesomeAssetRates };
+    let finalRates: Rates = { USD: 1, ...wiseFiatRates };
 
-	const missingFiatSymbols = FIAT_SYMBOLS.filter((s) => !finalRates[s]);
-	if (missingFiatSymbols.length > 0) {
-		console.log(`Missing ${missingFiatSymbols.length} FIAT rates, falling back to AwesomeAPI for: ${missingFiatSymbols.join(', ')}`);
-		const fallbackFiatRates = await fetchFromAwesomeApi(missingFiatSymbols, [], env.AWESOME_API_TOKEN);
-		finalRates = { ...finalRates, ...fallbackFiatRates };
-	}
-	return finalRates;
+    // Check if Wise returned any rates.
+    if (Object.keys(wiseFiatRates).length > 0) {
+        // Wise worked, so just fetch assets from AwesomeAPI.
+        const awesomeAssetRates = await fetchFromAwesomeApi([], ASSET_SYMBOLS, env.AWESOME_API_TOKEN);
+        finalRates = { ...finalRates, ...awesomeAssetRates };
+    } else {
+        // Wise failed completely. Fallback to AwesomeAPI for EVERYTHING.
+        console.log('Wise fetch failed. Falling back to AwesomeAPI for all remaining symbols.');
+        const missingFiatSymbols = FIAT_SYMBOLS.filter(s => !finalRates[s]);
+        const fallbackRates = await fetchFromAwesomeApi(missingFiatSymbols, ASSET_SYMBOLS, env.AWESOME_API_TOKEN);
+        finalRates = { ...finalRates, ...fallbackRates };
+    }
+
+    return finalRates;
 }
 
 // --- History Management ---
