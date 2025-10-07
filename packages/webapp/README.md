@@ -68,3 +68,14 @@ npm run build:webapp
 You can preview the production build with `npm run preview`.
 
 > Deployment is handled automatically by Cloudflare Pages, which monitors the `main` branch of the GitHub repository.
+
+### Cloudflare Pages Configuration
+
+To deploy this project correctly on Cloudflare Pages, use the following build settings:
+
+*   **Framework preset**: `SvelteKit`
+*   **Build command**: `npm run build:webapp`
+*   **Build output directory**: `packages/webapp/.svelte-kit/cloudflare`
+*   **Root directory**: `/` (repository root)
+
+Using the `.svelte-kit/cloudflare` directory is crucial, as it contains the output specifically tailored by the SvelteKit adapter for the Cloudflare environment.
